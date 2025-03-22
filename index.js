@@ -1,5 +1,5 @@
 import express from "express";
-import {PORT} from "./server.js";
+import { PORT } from "./server.js";
 
 const app = express();
 
