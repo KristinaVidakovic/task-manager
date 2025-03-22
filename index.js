@@ -30,6 +30,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  * /health:
  *   get:
  *     summary: Returns the health status of the API
+ *     tags: [API Health]
  *     responses:
  *       200:
  *         description: The API is healthy and running
