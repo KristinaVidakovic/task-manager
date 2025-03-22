@@ -1,1 +1,3 @@
-console.log('hello')
+require('dotenv').config();
+
+console.log(process.env.PORT);
