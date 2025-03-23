@@ -1,10 +1,16 @@
 import express from "express";
 import databaseConnection, { PORT } from "./server.js";
+import fs from "fs";
+import swaggerUi from "swagger-ui-express";
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+const swaggerDocument = JSON.parse(fs.readFileSync('./config/swagger.json', 'utf8'));
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.get("/health", async (req, res) => {
     const dbStatus = await databaseConnection();
