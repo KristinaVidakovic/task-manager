@@ -7,13 +7,26 @@
   },
   "servers": [
     {
-      "url": "http://localhost:8080",
+      "url": "http://localhost:9000",
       "description": "Local server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "auth-controller",
+      "description": "Auth Controller"
+    },
+    {
+      "name": "health-check",
+      "description": "Health Check"
     }
   ],
   "paths": {
     "/health": {
       "get": {
+        "tags": [
+          "health-check"
+        ],
         "summary": "Health check",
         "description": "Checks if the API is running",
         "responses": {
@@ -23,11 +36,81 @@
               "application/json": {
                 "example": {
                   "status": "UP",
-                  "timestamp": "2025-03-23T10:00:00.000Z",
-                  "database": "Connected"
+                  "timestamp": "2025-03-23T10:00:00.000Z"
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "summary": "New user registration.",
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "User successfully registered",
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2UyOGI0NWFkZDhlZjBiNzkxN2YwYzUiLCJpYXQiOjE3NDI5MDAwMzcsImV4cCI6MTc0Mjk4NjQzN30.OTTrXlY-1lTJW9Jiza2fcnqWZxZLVOme2W9u-bx2CJM",
+                  "user": {
+                    "_id": "67e28b45add8ef0b7917f0c5",
+                    "email": "pera.peric@email.com",
+                    "createdAt": "2025-03-25T10:53:57.839Z",
+                    "updatedAt": "2025-03-25T10:53:57.839Z",
+                    "__v": 0
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+               "example": {
+                 "error": "User already exists"
+               }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {}
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "title": "User",
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "pera.peric@email.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "1234"
           }
         }
       }

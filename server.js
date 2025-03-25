@@ -8,7 +8,7 @@ export const { PORT, DB_URI } = process.env;
 const databaseConnection = async () => {
     try {
         await mongoose.connect(DB_URI);
-        return mongoose.connection.readyState;
+        console.log("Connected to database");
     } catch (error) {
         console.error(error);
         process.exit(1);
