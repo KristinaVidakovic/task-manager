@@ -96,6 +96,79 @@
           }
         }
       }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "auth-controller"
+        ],
+        "summary": "User login",
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "User successfully logged in",
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2UyOGI0NWFkZDhlZjBiNzkxN2YwYzUiLCJpYXQiOjE3NDI5MDAwMzcsImV4cCI6MTc0Mjk4NjQzN30.OTTrXlY-1lTJW9Jiza2fcnqWZxZLVOme2W9u-bx2CJM",
+                  "user": {
+                    "_id": "67e28b45add8ef0b7917f0c5",
+                    "email": "pera.peric@email.com",
+                    "createdAt": "2025-03-25T10:53:57.839Z",
+                    "updatedAt": "2025-03-25T10:53:57.839Z",
+                    "__v": 0
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Email and password are required"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "User does not found"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Invalid password"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {}
+          }
+        }
+      }
     }
   },
   "components": {
