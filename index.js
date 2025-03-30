@@ -14,8 +14,8 @@ const swaggerDocument = JSON.parse(fs.readFileSync('./config/swagger.json', 'utf
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-app.use("/", healthRoute);
-app.use("/", authRoute);
+app.use(healthRoute);
+app.use(authRoute);
 
 app.listen(PORT, async () => {
     console.log(`Listening on ${PORT}`);
