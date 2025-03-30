@@ -2,7 +2,8 @@ import { Router } from "express";
 import { register } from "../controllers/auth.controller.js";
 
 const authRoute = Router();
+const baseUrl = "/api/auth";
 
-authRoute.post("/register", register);
+authRoute.post(`${baseUrl}/register`, register);
 
-export default authRoute;
+export { authRoute };

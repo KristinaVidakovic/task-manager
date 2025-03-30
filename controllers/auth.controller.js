@@ -8,7 +8,7 @@ dotenv.config();
 
 export const { JWT_SECRET, JWT_EXPIRES } = process.env;
 
-export const register = async (req, res, next) => {
+const register = async (req, res, next) => {
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -47,3 +47,5 @@ export const register = async (req, res, next) => {
         next(error);
     }
 }
+
+export { register }
