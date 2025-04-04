@@ -183,7 +183,7 @@
           },
           "password": {
             "type": "string",
-            "example": "1234"
+            "example": "Ys.12345"
           }
         }
       }

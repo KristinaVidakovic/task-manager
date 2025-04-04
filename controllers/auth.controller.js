@@ -19,6 +19,11 @@ const register = async (req, res, next) => {
                 error: "Password is required"
             });
         }
+        if (!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/)) {
+            return res.status(400).json({
+                error: "Password is not valid"
+            });
+        }
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({
