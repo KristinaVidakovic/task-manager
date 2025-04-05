@@ -14,14 +14,19 @@ const register = async (req, res, next) => {
 
     try {
         const { email, password } = req.body;
-        if (!password) {
+        if (!password || !email) {
             return res.status(400).json({
-                error: "Password is required"
+                error: "Password and email are required"
             });
         }
         if (!password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/)) {
             return res.status(400).json({
-                error: "Password is not valid"
+                error: "The password must be at least 8 characters long and consist of at least one number, one special character, one lowercase letter and one uppercase letter."
+            });
+        }
+        if (!email.match(/\S+@\S+\.\S+/)) {
+            return res.status(400).json({
+                error: "Email is not valid"
             });
         }
         const existingUser = await User.findOne({ email });
