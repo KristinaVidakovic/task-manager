@@ -17,6 +17,10 @@
       "description": "Auth Controller"
     },
     {
+      "name": "task-controller",
+      "description": "Task Controller"
+    },
+    {
       "name": "health-check",
       "description": "Health Check"
     }
@@ -169,9 +173,75 @@
           }
         }
       }
+    },
+    "/api/tasks": {
+      "post": {
+        "tags": [
+          "task-controller"
+        ],
+        "summary": "Create task",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Task"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "success",
+                  "task": {
+                    "title": "Naslov",
+                    "description": "Opis",
+                    "userId": "67f93ea8d58b28758fbeff4c",
+                    "_id": "67f9400c8d37950c08b1039d",
+                    "createdAt": "2025-04-11T16:15:08.040Z",
+                    "updatedAt": "2025-04-11T16:15:08.040Z",
+                    "__v": 0
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "You are not authorized."
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {}
+          }
+        }
+      }
     }
   },
   "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
     "schemas": {
       "User": {
         "title": "User",
@@ -184,6 +254,20 @@
           "password": {
             "type": "string",
             "example": "Ys.12345"
+          }
+        }
+      },
+      "Task": {
+        "title": "Task",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Title"
+          },
+          "description": {
+            "type": "string",
+            "example": "Description"
           }
         }
       }

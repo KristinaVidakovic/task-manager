@@ -4,6 +4,7 @@ import fs from "fs";
 import swaggerUi from "swagger-ui-express";
 import { authRoute } from "./routes/auth.route.js";
 import { healthRoute } from "./routes/health.route.js";
+import {taskRoute} from "./routes/task.route.js";
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(healthRoute);
 app.use(authRoute);
+app.use(taskRoute);
 
 app.listen(PORT, async () => {
     console.log(`Listening on ${PORT}`);
