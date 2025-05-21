@@ -198,6 +198,7 @@
                                     "task": {
                                         "title": "Naslov",
                                         "description": "Opis",
+                                        "status": "Completed",
                                         "userId": "67f93ea8d58b28758fbeff4c",
                                         "_id": "67f9400c8d37950c08b1039d",
                                         "createdAt": "2025-04-11T16:15:08.040Z",
@@ -214,6 +215,98 @@
                             "application/json": {
                                 "example": {
                                     "error": "Missing values for title or/and description"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "error": "You are not authorized."
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {}
+                    }
+                }
+            },
+            "get": {
+                "tags": ["task-controller"],
+                "summary": "Get all tasks",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter tasks by status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": ["pending", "in-progress", "completed"]
+                        }
+                    },
+                    {
+                        "name": "sort",
+                        "in": "query",
+                        "description": "Sort order: asc or desc",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": ["asc", "desc"]
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "tasks": [
+                                        {
+                                            "_id": "67fe7ab4bf1bde6679a16fb9",
+                                            "title": "Naslov",
+                                            "description": "Opis",
+                                            "status": "completed",
+                                            "userId": "67f93ea8d58b28758fbeff4c",
+                                            "createdAt": "2025-04-15T15:26:44.717Z",
+                                            "updatedAt": "2025-04-15T15:26:44.717Z",
+                                            "__v": 0
+                                        }
+                                    ],
+                                    "total": 1,
+                                    "page": 1,
+                                    "limit": 1,
+                                    "totalPages": 1
                                 }
                             }
                         }
@@ -270,6 +363,10 @@
                     "description": {
                         "type": "string",
                         "example": "Description"
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "Completed"
                     }
                 }
             }
