@@ -4,6 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "lint": "eslint . --ext .js --config config/eslint.config.js",
     "start": "node index.js",
     "dev": "nodemon index.js",
     "prepare": "husky",
