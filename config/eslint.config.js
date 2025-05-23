@@ -10,6 +10,7 @@ export default defineConfig([
       sourceType: "module",
       globals: {
         ...globals.node,
+        ...globals.jest,
         ...globals.es2021,
       },
     },
