@@ -53,15 +53,15 @@ describe("getAllTasks controller", () => {
     });
   });
 
-  it('filters tasks by status', async () => {
-    req.query.status = 'pending';
+  it("filters tasks by status", async () => {
+    req.query.status = "pending";
 
     Task.find.mockReturnValue({
       sort: jest.fn().mockReturnValue({
         skip: jest.fn().mockReturnValue({
-          limit: jest.fn().mockResolvedValue([])
-        })
-      })
+          limit: jest.fn().mockResolvedValue([]),
+        }),
+      }),
     });
 
     Task.countDocuments.mockResolvedValue(0);
@@ -70,19 +70,19 @@ describe("getAllTasks controller", () => {
 
     expect(Task.find).toHaveBeenCalledWith({
       userId: id,
-      status: 'pending'
+      status: "pending",
     });
   });
 
-  it('searches tasks by title and description', async () => {
-    req.query.search = 'meeting';
+  it("searches tasks by title and description", async () => {
+    req.query.search = "meeting";
 
     Task.find.mockReturnValue({
       sort: jest.fn().mockReturnValue({
         skip: jest.fn().mockReturnValue({
-          limit: jest.fn().mockResolvedValue([])
-        })
-      })
+          limit: jest.fn().mockResolvedValue([]),
+        }),
+      }),
     });
 
     Task.countDocuments.mockResolvedValue(0);
@@ -91,16 +91,15 @@ describe("getAllTasks controller", () => {
 
     expect(Task.find).toHaveBeenCalledWith({
       userId: id,
-      $or: [
-        { title: expect.any(RegExp) },
-        { description: expect.any(RegExp) }
-      ]
+      $or: [{ title: expect.any(RegExp) }, { description: expect.any(RegExp) }],
     });
   });
 
-  it('calls next with error when something fails', async () => {
-    const error = new Error('Database error');
-    Task.find.mockImplementation(() => { throw error; });
+  it("calls next with error when something fails", async () => {
+    const error = new Error("Database error");
+    Task.find.mockImplementation(() => {
+      throw error;
+    });
 
     await getAllTasks(req, res, next);
 
