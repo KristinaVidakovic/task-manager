@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
-import Task from "../models/task.model.js";
-import { getAllTasks } from "../controllers/task.controller.js";
+import Task from "../../models/task.model.js";
+import { getAllTasks } from "../../controllers/task.controller.js";
 
-jest.mock("../models/task.model");
+jest.mock("../../models/task.model.js");
 
 describe("getAllTasks controller", () => {
   let req, res, next;
