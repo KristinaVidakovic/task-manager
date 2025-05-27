@@ -11,7 +11,7 @@ export default defineConfig([
       globals: {
         ...globals.node,
         ...globals.jest,
-        ...globals.es2021,
+        ...globals.es2021
       },
     },
     plugins: {
@@ -19,6 +19,16 @@ export default defineConfig([
     },
     rules: {
       ...js.configs.recommended.rules,
+    },
+  },
+  {
+    files: ["**/*.cy.{js,ts}"],
+    languageOptions: {
+      globals: {
+        ...globals.mocha,
+        cy: true,
+        Cypress: true
+      },
     },
   },
 ]);
