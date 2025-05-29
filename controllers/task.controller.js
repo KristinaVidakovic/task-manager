@@ -25,12 +25,12 @@ const createTask = async (req, res, next) => {
 
 const getAllTasks = async (req, res, next) => {
   try {
-    const status = req.query.status;
+    const { status, search } = req.query;
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    const order = req.query.sort === 'asc' ? 1 : -1;
-    const sortField = 'createdAt';
+    const order = req.query.sort === "asc" ? 1 : -1;
+    const sortField = "createdAt";
 
     const query = {
       userId: req.user._id,
@@ -40,7 +40,13 @@ const getAllTasks = async (req, res, next) => {
       query.status = status;
     }
 
-    const allTasks = await Task.find(query).sort({ [sortField]: order })
+    if (search) {
+      const regex = new RegExp(search, "i");
+      query.$or = [{ title: regex }, { description: regex }];
+    }
+
+    const allTasks = await Task.find(query)
+      .sort({ [sortField]: order })
       .skip(skip)
       .limit(limit);
     const total = await Task.countDocuments();
@@ -50,7 +56,7 @@ const getAllTasks = async (req, res, next) => {
       total,
       page,
       limit,
-      totalPages: Math.ceil(total / limit)
+      totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
     next(error);
