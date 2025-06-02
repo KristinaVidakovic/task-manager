@@ -1,4 +1,5 @@
 import Task from "../models/task.model.js";
+import validator from 'validator';
 
 const createTask = async (req, res, next) => {
   try {
@@ -63,4 +64,36 @@ const getAllTasks = async (req, res, next) => {
   }
 };
 
-export { createTask, getAllTasks };
+const getTaskById = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+
+    if (!validator.isUUID(id)) {
+      return res.status(400).json({
+        error: "Invalid UUID format.",
+      });
+    }
+
+    const query = {
+      _id: id,
+      userId: req.user._id,
+    };
+
+    const task = await Task.findOne(query);
+
+    if (!task) {
+      return res.status(404).json({
+        error: "Task with forwarded ID not found",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      task,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { createTask, getAllTasks, getTaskById };
