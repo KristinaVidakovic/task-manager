@@ -1,16 +1,18 @@
 import { v4 as uuidv4 } from "uuid";
 import Task from "../../models/task.model.js";
-import { getAllTasks } from "../../controllers/task.controller.js";
+import { getAllTasks, getTaskById } from "../../controllers/task.controller.js";
 
 jest.mock("../../models/task.model.js");
 
-describe("getAllTasks controller", () => {
+describe("TaskController tests", () => {
   let req, res, next;
   const id = uuidv4();
+  const userId = uuidv4();
 
   beforeEach(() => {
     req = {
-      user: { _id: id },
+      params: { id: id },
+      user: { _id: userId },
       query: {},
     };
     res = {
@@ -24,85 +26,144 @@ describe("getAllTasks controller", () => {
     jest.clearAllMocks();
   });
 
-  it("returns paginated tasks for authenticated user", async () => {
-    const tasksMock = [
-      { title: "Task 1", description: "description", status: "completed" },
-      { title: "Task 2", description: "description 2", status: "in-progress" },
-    ];
+  describe("getAllTasks tests", () => {
+    it("returns paginated tasks for authenticated user", async () => {
+      const tasksMock = [
+        { title: "Task 1", description: "description", status: "completed" },
+        {
+          title: "Task 2",
+          description: "description 2",
+          status: "in-progress",
+        },
+      ];
 
-    Task.find.mockReturnValue({
-      sort: jest.fn().mockReturnValue({
-        skip: jest.fn().mockReturnValue({
-          limit: jest.fn().mockResolvedValue(tasksMock),
+      Task.find.mockReturnValue({
+        sort: jest.fn().mockReturnValue({
+          skip: jest.fn().mockReturnValue({
+            limit: jest.fn().mockResolvedValue(tasksMock),
+          }),
         }),
-      }),
+      });
+
+      Task.countDocuments.mockResolvedValue(2);
+
+      await getAllTasks(req, res, next);
+
+      expect(Task.find).toHaveBeenCalledWith({ userId: userId });
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        tasks: tasksMock,
+        total: 2,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      });
     });
 
-    Task.countDocuments.mockResolvedValue(2);
+    it("filters tasks by status", async () => {
+      req.query.status = "pending";
 
-    await getAllTasks(req, res, next);
+      Task.find.mockReturnValue({
+        sort: jest.fn().mockReturnValue({
+          skip: jest.fn().mockReturnValue({
+            limit: jest.fn().mockResolvedValue([]),
+          }),
+        }),
+      });
 
-    expect(Task.find).toHaveBeenCalledWith({ userId: id });
-    expect(res.status).toHaveBeenCalledWith(200);
-    expect(res.json).toHaveBeenCalledWith({
-      tasks: tasksMock,
-      total: 2,
-      page: 1,
-      limit: 10,
-      totalPages: 1,
+      Task.countDocuments.mockResolvedValue(0);
+
+      await getAllTasks(req, res, next);
+
+      expect(Task.find).toHaveBeenCalledWith({
+        userId: userId,
+        status: "pending",
+      });
+    });
+
+    it("searches tasks by title and description", async () => {
+      req.query.search = "meeting";
+
+      Task.find.mockReturnValue({
+        sort: jest.fn().mockReturnValue({
+          skip: jest.fn().mockReturnValue({
+            limit: jest.fn().mockResolvedValue([]),
+          }),
+        }),
+      });
+
+      Task.countDocuments.mockResolvedValue(0);
+
+      await getAllTasks(req, res, next);
+
+      expect(Task.find).toHaveBeenCalledWith({
+        userId: userId,
+        $or: [
+          { title: expect.any(RegExp) },
+          { description: expect.any(RegExp) },
+        ],
+      });
+    });
+
+    it("calls next with error when something fails", async () => {
+      const error = new Error("Database error");
+      Task.find.mockImplementation(() => {
+        throw error;
+      });
+
+      await getAllTasks(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(error);
     });
   });
 
-  it("filters tasks by status", async () => {
-    req.query.status = "pending";
+  describe("getTaskById tests", () => {
+    it('should return 200 and the task if found', async () => {
+      const mockTask = { _id: id, userId: userId, title: 'Test Task' };
+      Task.findOne.mockResolvedValue(mockTask);
 
-    Task.find.mockReturnValue({
-      sort: jest.fn().mockReturnValue({
-        skip: jest.fn().mockReturnValue({
-          limit: jest.fn().mockResolvedValue([]),
-        }),
-      }),
+      await getTaskById(req, res, next);
+
+      expect(Task.findOne).toHaveBeenCalledWith({
+        _id: id,
+        userId: userId,
+      });
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        status: 'success',
+        task: mockTask,
+      });
+      expect(next).not.toHaveBeenCalled();
     });
 
-    Task.countDocuments.mockResolvedValue(0);
+    it('should return 404 if task is not found', async () => {
+      Task.findOne.mockResolvedValue(null);
 
-    await getAllTasks(req, res, next);
+      await getTaskById(req, res, next);
 
-    expect(Task.find).toHaveBeenCalledWith({
-      userId: id,
-      status: "pending",
-    });
-  });
+      expect(Task.findOne).toHaveBeenCalledWith({
+        _id: id,
+        userId: userId,
+      });
 
-  it("searches tasks by title and description", async () => {
-    req.query.search = "meeting";
-
-    Task.find.mockReturnValue({
-      sort: jest.fn().mockReturnValue({
-        skip: jest.fn().mockReturnValue({
-          limit: jest.fn().mockResolvedValue([]),
-        }),
-      }),
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({
+        error: 'Task with forwarded ID not found',
+      });
+      expect(next).not.toHaveBeenCalled();
     });
 
-    Task.countDocuments.mockResolvedValue(0);
+    it('should call next with error if something goes wrong', async () => {
+      const error = new Error('DB error');
+      Task.findOne.mockRejectedValue(error);
 
-    await getAllTasks(req, res, next);
+      await getTaskById(req, res, next);
 
-    expect(Task.find).toHaveBeenCalledWith({
-      userId: id,
-      $or: [{ title: expect.any(RegExp) }, { description: expect.any(RegExp) }],
+      expect(Task.findOne).toHaveBeenCalled();
+      expect(next).toHaveBeenCalledWith(error);
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.json).not.toHaveBeenCalled();
     });
-  });
-
-  it("calls next with error when something fails", async () => {
-    const error = new Error("Database error");
-    Task.find.mockImplementation(() => {
-      throw error;
-    });
-
-    await getAllTasks(req, res, next);
-
-    expect(next).toHaveBeenCalledWith(error);
   });
 });
