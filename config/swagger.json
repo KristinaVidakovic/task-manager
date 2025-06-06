@@ -336,6 +336,75 @@
                     }
                 }
             }
+        },
+        "/api/tasks/{id}": {
+            "get": {
+                "tags": ["task-controller"],
+                "summary": "Get task by ID",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Task ID in UUID format",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "status": "success",
+                                    "task": {
+                                        "_id": "683d8417e7997c67d1578448",
+                                        "title": "Naslov",
+                                        "description": "Opis",
+                                        "status": "in-progress",
+                                        "userId": "68359409f55cdf98ddba3ffe",
+                                        "createdAt": "2025-06-02T10:59:35.352Z",
+                                        "updatedAt": "2025-06-02T10:59:35.352Z",
+                                        "__v": 0
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "error": "You are not authorized."
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "example": {
+                                    "error": "Task with forwarded ID not found"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {}
+                    }
+                }
+            }
         }
     },
     "components": {

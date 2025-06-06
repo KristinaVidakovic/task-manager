@@ -10,7 +10,8 @@
     "prepare": "husky",
     "test": "jest",
     "test:coverage": "jest --coverage",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:cypress": "npx cypress run"
   },
   "keywords": [],
   "author": "",
