@@ -89,4 +89,48 @@ const getTaskById = async (req, res, next) => {
   }
 };
 
-export { createTask, getAllTasks, getTaskById };
+const updateTask = async (req, res, next) => {
+  try {
+    const id = req.params.id;
+
+    const query = {
+      _id: id,
+      userId: req.user._id,
+    };
+
+    const task = await Task.findOne(query);
+
+    if (!task) {
+      return res.status(404).json({
+        error: "Task with forwarded ID not found",
+      });
+    }
+
+    const newTask = {
+      id,
+      title: req.body.title ? req.body.title : task.title,
+      description: req.body.description ? req.body.description : task.description,
+      status: req.body.status ? req.body.status : task.status,
+      userId: req.user._id,
+    };
+
+    const updatedTask = await Task.findByIdAndUpdate(
+      id,
+      {
+        ...newTask,
+        $inc: { __v: 1 }
+      },
+      { new: true },
+    );
+
+    return res.status(200).json({
+      status: "success",
+      task: updatedTask,
+    });
+
+  } catch (error) {
+    next(error);
+  }
+}
+
+export { createTask, getAllTasks, getTaskById, updateTask };
