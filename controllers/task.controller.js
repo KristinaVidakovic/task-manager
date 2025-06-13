@@ -67,18 +67,7 @@ const getTaskById = async (req, res, next) => {
   try {
     const id = req.params.id;
 
-    const query = {
-      _id: id,
-      userId: req.user._id,
-    };
-
-    const task = await Task.findOne(query);
-
-    if (!task) {
-      return res.status(404).json({
-        error: "Task with forwarded ID not found",
-      });
-    }
+    const task = await findTask(id, req.user, res);
 
     return res.status(200).json({
       status: "success",
@@ -93,18 +82,7 @@ const updateTask = async (req, res, next) => {
   try {
     const id = req.params.id;
 
-    const query = {
-      _id: id,
-      userId: req.user._id,
-    };
-
-    const task = await Task.findOne(query);
-
-    if (!task) {
-      return res.status(404).json({
-        error: "Task with forwarded ID not found",
-      });
-    }
+    const task = await findTask(id, req.user, res);
 
     const newTask = {
       id,
@@ -137,18 +115,7 @@ const deleteTask = async (req, res, next) => {
   try {
     const id = req.params.id;
 
-    const query = {
-      _id: id,
-      userId: req.user._id,
-    };
-
-    const task = await Task.findOne(query);
-
-    if (!task) {
-      return res.status(404).json({
-        error: "Task with forwarded ID not found",
-      });
-    }
+    await findTask(id, req.user, res);
 
     await Task.findByIdAndDelete(id);
 
@@ -159,5 +126,22 @@ const deleteTask = async (req, res, next) => {
     next(error);
   }
 };
+
+async function findTask (id, user, res) {
+  const query = {
+    _id: id,
+    userId: user._id,
+  };
+
+  const task = await Task.findOne(query);
+
+  if (!task) {
+    return res.status(404).json({
+      error: "Task with forwarded ID not found",
+    });
+  }
+
+  return task;
+}
 
 export { createTask, getAllTasks, getTaskById, updateTask, deleteTask };
